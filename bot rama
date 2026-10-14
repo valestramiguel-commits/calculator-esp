@@ -1,0 +1,37 @@
+import discord
+from bot_logic import*
+import requests
+from discord.ext import commands
+
+def get_weather(city: str):
+    base_url = f"https://wttr.in/{city}?format=%C+%t"
+    response = requests.get(base_url)
+    
+    if response.status_code == 200:
+        return response.text.strip()
+    else:
+        return "No se pudo obtener el clima"
+
+# Inicializar el bot
+intents = discord.Intents.default()
+intents.message_content = True  # Para leer mensajes
+bot = commands.Bot(command_prefix="!", intents=intents)
+
+@bot.event
+async def on_ready():
+    print(f'Hemos iniciado sesión como {bot.user}')
+# Manejador de comando !start
+@bot.command()
+async def start(ctx):
+    await ctx.send("¡Hola! Soy un bot que anuncia el pronóstico del tiempo.")
+
+
+
+@bot.command()
+async def clima(ctx, ciudad: str):
+    clima_info = get_weather(ciudad)
+    await ctx.send(clima_info)
+    
+
+# Iniciar el bot
+bot.run(TOKEN)
